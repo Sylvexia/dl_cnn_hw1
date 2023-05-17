@@ -160,4 +160,5 @@ cython_debug/
 #.idea/
 
 ex_1
+ex_2
 data
