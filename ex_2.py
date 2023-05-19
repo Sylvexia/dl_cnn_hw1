@@ -20,7 +20,7 @@ def train_cifar_100():
     train_loader, val_loader, test_loader = data_process.load_cifar_aug(
         cifar_100_dir, False)
 
-    model_handler.train(25, cnn, train_loader,
+    model_handler.train(5, cnn, train_loader,
                         val_loader, adam, ex_2_100_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_2_100_dir)
@@ -34,7 +34,7 @@ def train_cifar_10():
     train_loader, val_loader, test_loader = data_process.load_cifar_aug(
         cifar_10_dir, True)
 
-    model_handler.train(25, cnn, train_loader, val_loader,
+    model_handler.train(5, cnn, train_loader, val_loader,
                         adam, ex_2_10_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_2_10_dir)
