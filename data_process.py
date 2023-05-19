@@ -30,8 +30,8 @@ def aug_transformations() -> transforms.Compose:
 
 def base_transformation() -> transforms.Compose:
     transform = transforms.Compose([
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
     return transform
 
