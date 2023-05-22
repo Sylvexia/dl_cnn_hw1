@@ -28,6 +28,16 @@ def aug_transformations() -> transforms.Compose:
     return transform
 
 
+def eff_aug():
+    transform = transforms.Compose([
+        transforms.Resize((128, 128), antialias=True),
+        transforms.RandomRotation(30),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+    ])
+    return transform
+
+
 def base_transformation() -> transforms.Compose:
     transform = transforms.Compose([
         transforms.ToTensor(),
@@ -85,7 +95,7 @@ def load_cifar_aug(dir, is_10, num_iteration=3, batch_size=64, split_ratio=0.8, 
 
 def load_cifar_10(dir, batch_size=64, transformations=base_transformation()) -> tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     train_set = torchvision.datasets.CIFAR10(
-        root=dir, train=True, download=True, transform=base_transformation())
+        root=dir, train=True, download=True, transform=transformations)
 
     train_set_size = int(0.8 * len(train_set))
     val_set_size = len(train_set) - train_set_size
@@ -108,7 +118,7 @@ def load_cifar_10(dir, batch_size=64, transformations=base_transformation()) -> 
 
 def load_cifar_100(dir, batch_size=64, transformations=base_transformation()) -> tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     train_set = torchvision.datasets.CIFAR100(
-        root=dir, train=True, download=True, transform=base_transformation())
+        root=dir, train=True, download=True, transform=transformations)
 
     train_set_size = int(0.8 * len(train_set))
     val_set_size = len(train_set) - train_set_size
