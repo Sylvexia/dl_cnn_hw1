@@ -30,10 +30,10 @@ def aug_transformations() -> transforms.Compose:
 
 def eff_aug():
     transform = transforms.Compose([
-        transforms.Resize((128, 128), antialias=True),
+        transforms.Resize((224, 224), antialias=True),
         transforms.RandomRotation(30),
         transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
     ])
     return transform
 
