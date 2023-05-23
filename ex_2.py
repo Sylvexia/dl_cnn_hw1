@@ -40,6 +40,6 @@ def train_cifar_10():
     visualizer.getMetrics(cnn, test_loader, ex_2_10_dir)
     visualizer.save_result_fig(ex_2_10_dir)
 
-
-train_cifar_10()
-train_cifar_100()
+if __name__ == '__main__':
+    train_cifar_10()
+    train_cifar_100()

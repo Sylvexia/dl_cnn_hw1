@@ -16,10 +16,10 @@ def train_cifar_100():
     weights = EfficientNet_V2_S_Weights.IMAGENET1K_V1
     cnn = efficientnet_v2_s(weights=weights)
     train_loader, val_loader, test_loader = data_process.load_cifar_100(
-        cifar_100_dir, transformations=data_process.eff_aug(), batch_size=16)
+        cifar_100_dir, transformations=data_process.eff_aug(), batch_size=64)
     lion = Lion(cnn.parameters(), lr=1e-4, weight_decay=1e-2)
 
-    model_handler.train(3, cnn, train_loader,
+    model_handler.train(10, cnn, train_loader,
                         val_loader, lion, ex_2_100_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_2_100_dir)
@@ -34,10 +34,10 @@ def train_cifar_10():
     weights = EfficientNet_V2_S_Weights.IMAGENET1K_V1
     cnn = efficientnet_v2_s(weights=weights)
     train_loader, val_loader, test_loader = data_process.load_cifar_10(
-        cifar_10_dir, transformations=data_process.eff_aug(), batch_size=16)
+        cifar_10_dir, transformations=data_process.eff_aug(), batch_size=64)
     lion = Lion(cnn.parameters(), lr=1e-4, weight_decay=1e-2)
 
-    model_handler.train(3, cnn, train_loader, val_loader,
+    model_handler.train(10, cnn, train_loader, val_loader,
                         lion, ex_2_10_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_2_10_dir)

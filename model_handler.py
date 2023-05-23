@@ -31,6 +31,7 @@ def train(num_epochs, model, train_loader, val_loader,
         train_loss = 0.0
         train_total = 0.0
         train_correct = 0.0
+        epoch_start = time.time()
         model.train()
         for images, labels in train_loader:
             images = images.to(device)
@@ -47,6 +48,9 @@ def train(num_epochs, model, train_loader, val_loader,
             train_total += labels.size(0)
             train_correct += (predicted == labels).sum().item()
 
+        epoch_end = time.time()
+        epoch_time = epoch_end-epoch_start
+        print(f"Epoch time: {epoch+1}", epoch_time)
         train_loss = train_loss/len(train_loader.dataset)
         train_accuracy = (100*train_correct)/train_total
 
