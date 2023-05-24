@@ -18,9 +18,9 @@ def train_cifar_100():
     cnn = base_cnn.Base_CNN(100)
     adam = optim.Adam(cnn.parameters(), lr=0.001, weight_decay=0.0001)
     train_loader, val_loader, test_loader = data_process.load_cifar_100(
-        cifar_100_dir)
+        cifar_100_dir, batch_size=128, aug=None, pre_process=data_process.base_transformation())
 
-    model_handler.train(25, cnn, train_loader, val_loader, adam, ex_1_100_dir, 5)
+    model_handler.train(50, cnn, train_loader, val_loader, adam, ex_1_100_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_1_100_dir)
     visualizer.save_result_fig(ex_1_100_dir)
@@ -31,9 +31,9 @@ def train_cifar_10():
     adam = optim.Adam(cnn.parameters(), lr=0.001, weight_decay=0.0001)
 
     train_loader, val_loader, test_loader = data_process.load_cifar_10(
-        cifar_10_dir)
+        cifar_10_dir, batch_size=128, aug=None, pre_process=data_process.base_transformation())
 
-    model_handler.train(25, cnn, train_loader, val_loader,
+    model_handler.train(50, cnn, train_loader, val_loader,
                         adam, ex_1_10_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_1_10_dir)

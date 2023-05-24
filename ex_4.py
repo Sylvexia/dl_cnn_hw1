@@ -6,8 +6,6 @@ import datetime
 from lion_pytorch import Lion
 from torchvision.models import efficientnet_v2_s, EfficientNet_V2_S_Weights
 
-
-
 def train_cifar_100():
     cifar_100_dir = "./data/cifar_100"
     ex_2_100_dir = "./ex_4/cifar_100/" + \
@@ -16,7 +14,9 @@ def train_cifar_100():
     weights = EfficientNet_V2_S_Weights.IMAGENET1K_V1
     cnn = efficientnet_v2_s(weights=weights)
     train_loader, val_loader, test_loader = data_process.load_cifar_100(
-        cifar_100_dir, transformations=data_process.eff_aug(), batch_size=64)
+        cifar_100_dir, batch_size=64, 
+        aug=data_process.eff_aug(), pre_process=data_process.enlarge_transformation())
+    
     lion = Lion(cnn.parameters(), lr=1e-4, weight_decay=1e-2)
 
     model_handler.train(10, cnn, train_loader,
@@ -34,7 +34,9 @@ def train_cifar_10():
     weights = EfficientNet_V2_S_Weights.IMAGENET1K_V1
     cnn = efficientnet_v2_s(weights=weights)
     train_loader, val_loader, test_loader = data_process.load_cifar_10(
-        cifar_10_dir, transformations=data_process.eff_aug(), batch_size=64)
+        cifar_10_dir, batch_size=64,
+        aug=data_process.eff_aug(), pre_process=data_process.enlarge_transformation())
+    
     lion = Lion(cnn.parameters(), lr=1e-4, weight_decay=1e-2)
 
     model_handler.train(10, cnn, train_loader, val_loader,
@@ -42,8 +44,6 @@ def train_cifar_10():
 
     visualizer.getMetrics(cnn, test_loader, ex_2_10_dir)
     visualizer.save_result_fig(ex_2_10_dir)
-
-
 
 if __name__ == '__main__':
     train_cifar_10()
