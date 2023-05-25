@@ -11,7 +11,7 @@ import json
 def train(num_epochs, model, train_loader, val_loader,
           optimizer, save_dir,
           save_every_epochs=5, loss_fn=nn.CrossEntropyLoss(),
-          device=torch.device("cuda:0")):
+          scheduler=None, device=torch.device("cuda:0")):
 
     best_val_accuracy = 0.0
     best_epoch = 0
@@ -42,6 +42,9 @@ def train(num_epochs, model, train_loader, val_loader,
             loss = loss_fn(outputs, labels)
             loss.backward()
             optimizer.step()
+
+            if(scheduler != None):
+                scheduler.step()
 
             train_loss += loss.item()*images.size(0)
             _, predicted = torch.max(outputs.data, 1)

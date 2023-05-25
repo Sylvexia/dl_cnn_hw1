@@ -18,10 +18,10 @@ def train_cifar_100():
     cnn = efficientnet_v2_s(weights=weights)
     train_loader, val_loader, test_loader = data_process.load_cifar_100(
         cifar_100_dir, batch_size = 64, 
-        aug=data_process.enlarge_transformation(), pre_process=data_process.enlarge_transformation())
+        aug=data_process.base_transformation(), pre_process=data_process.base_transformation())
     adam = optim.Adam(cnn.parameters(), lr=0.0001, weight_decay=0.0001)
 
-    model_handler.train(10, cnn, train_loader,
+    model_handler.train(40, cnn, train_loader,
                         val_loader, adam, ex_3_100_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_3_100_dir)
@@ -32,14 +32,15 @@ def train_cifar_10():
     cnn = efficientnet_v2_s(weights=weights)
     train_loader, val_loader, test_loader = data_process.load_cifar_10(
         cifar_10_dir, batch_size = 64, 
-        aug=data_process.enlarge_transformation(), pre_process=data_process.enlarge_transformation())
+        aug=data_process.base_transformation(), pre_process=data_process.base_transformation())
     adam = optim.Adam(cnn.parameters(), lr=0.0001, weight_decay=0.0001)
 
-    model_handler.train(10, cnn, train_loader, val_loader,
+    model_handler.train(40, cnn, train_loader, val_loader,
                         adam, ex_3_10_dir, 5)
 
     visualizer.getMetrics(cnn, test_loader, ex_3_10_dir)
     visualizer.save_result_fig(ex_3_10_dir)
 
-train_cifar_10()
-train_cifar_100()
+if __name__ == '__main__':
+    train_cifar_10()
+    train_cifar_100()

@@ -17,7 +17,7 @@ def enlarge_transformation() -> transforms.Compose:
 def aug_transformations() -> transforms.Compose:
     transform = transforms.Compose([
         transforms.Resize((128, 128), antialias=True),
-        transforms.RandomCrop(128, padding=4),
+        transforms.RandomCrop(128, padding=16),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
@@ -28,7 +28,7 @@ def aug_transformations() -> transforms.Compose:
 def eff_aug():
     transform = transforms.Compose([
         transforms.Resize((128, 128), antialias=True),
-        transforms.RandomCrop(128, padding=4),
+        transforms.RandomCrop(128, padding=16),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
