@@ -54,6 +54,34 @@ Also it would also generate data for cache-ing the cifar10/cifar100 datasets.
 
 Basically, the model is the same as what the professor gave us. What's different is the batch size is 128, and the number of epoch is 50.
 
+The model architecture is as follows: (num_classes = 100 for cifar100)
+
+```
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1           [-1, 12, 30, 30]             912
+       BatchNorm2d-2           [-1, 12, 30, 30]              24
+            Conv2d-3           [-1, 12, 28, 28]           3,612
+       BatchNorm2d-4           [-1, 12, 28, 28]              24
+         MaxPool2d-5           [-1, 12, 14, 14]               0
+            Conv2d-6           [-1, 24, 12, 12]           7,224
+       BatchNorm2d-7           [-1, 24, 12, 12]              48
+            Conv2d-8           [-1, 24, 10, 10]          14,424
+       BatchNorm2d-9           [-1, 24, 10, 10]              48
+           Linear-10                  [-1, 100]         240,100
+================================================================
+Total params: 266,416
+Trainable params: 266,416
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.01
+Forward/backward pass size (MB): 0.42
+Params size (MB): 1.02
+Estimated Total Size (MB): 1.44
+----------------------------------------------------------------
+```
+
 Here's Cifar 10 results:
 
 ![picture 1](images/f7e0e16dc1ab278656134d68fd2effb041c36c9fce0edb3edde1b2db41172b37.png)
@@ -111,6 +139,80 @@ As the result shows, it have overfitting problem. Especially cifar100. Since the
 In this experiment, this is the first time I learned that what is overfitting, and longer training epoch is not the fix.
 
 Also, fun fact: I literally ask LLM what metrics should I include in the report, and the metrics above is what it gave me, and I learned what these new metrics means on the fly. Due to the test set number of class is identical for all the classes. the recall score and the accuracy should be the same. This surprise me the first.
+
+### EX-2
+
+For the spculation above, I think it's good to add some changes accordingly:
+
+1. Augmenting the number of class samples.
+2. Resizing the image to larger size.
+3. Making the model larger to extract more features.
+
+Simply words: Bigger, better and stronger.
+
+So I make the model as following:
+
+```
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1         [-1, 16, 128, 128]             448
+       BatchNorm2d-2         [-1, 16, 128, 128]              32
+              ReLU-3         [-1, 16, 128, 128]               0
+         MaxPool2d-4           [-1, 16, 64, 64]               0
+            Conv2d-5           [-1, 32, 64, 64]           4,640
+       BatchNorm2d-6           [-1, 32, 64, 64]              64
+              ReLU-7           [-1, 32, 64, 64]               0
+         MaxPool2d-8           [-1, 32, 32, 32]               0
+            Conv2d-9           [-1, 64, 32, 32]          18,496
+      BatchNorm2d-10           [-1, 64, 32, 32]             128
+             ReLU-11           [-1, 64, 32, 32]               0
+        MaxPool2d-12           [-1, 64, 16, 16]               0
+           Linear-13                 [-1, 1024]      16,778,240
+             ReLU-14                 [-1, 1024]               0
+           Linear-15                  [-1, 100]         102,500
+================================================================
+Total params: 16,904,548
+Trainable params: 16,904,548
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.19
+Forward/backward pass size (MB): 11.39
+Params size (MB): 64.49
+Estimated Total Size (MB): 76.06
+----------------------------------------------------------------
+```
+
+Specifically:
+
+- Input: ```3*128*128```
+- 3 convolution layer are all ```kernel_size=3, stride=1, padding=1```
+- 3 max pooling layers are all ```kernel_size=2, stride=2```.
+- 2 linear layers: with 1024 and 10/100 output (cifar10/cifar100)
+- Activation function are all ReLU
+
+The reason my design was:
+
+- In the VGG model paper, it states that using smaller size convolution can increase the receptive field.
+- Also using size 3 convoltion layer is just easier to design the layer afterwards.
+- Multiple linear layers seems perform better than single layer.
+- With the consideration of training time, and increase the size of the image, 
+I'm afraid of increasing the depth of the network.
+
+For the data augmentation part, basically I'm refer to the artical:
+[(Image Classification — Cifar100)](https://shihyung1221.medium.com/image-classification-cifar100-af751271b398): The author resize to image larger to get better result. Hence, I do the following for the augmentation:
+
+```
+transforms.Resize((128, 128), antialias=True),
+transforms.RandomCrop(128, padding=16),
+transforms.RandomHorizontalFlip(),
+```
+
+The way I didn't do too much augmentation has 2 reasons:
+- I was trying training on WSL and kaggle, transformation cause massive bottleneck during training. The GPU did random spike with low utilization on WSL. For kaggle, it overloads the GPU. (Although I did re-train on native linux and the performance is a lot better)
+- This project [kuangliu /
+pytorch-cifar](https://github.com/kuangliu/pytorch-cifar/blob/master/main.py) only use the transformation above with sigle decay of learning rate to achieve over 90% accuracy on cifar 10.
+
 
 ## Mistake I've made
 
