@@ -436,6 +436,8 @@ Here, I feed the model ```32*32``` image directly to the model, without resizing
 
 (Parameters: lr=0.0001, weight_decay=0.0001, epoch = 40)
 
+During the transfer learning, it seems the learning rate shouldn't be too high.
+
 Here's cifar 10 result:
 
 ![picture 23](images/b5dfce62b61eb0485f6b3acb9a231eaf13821e84fbabaf45158930864713aeae.png)  
@@ -489,11 +491,39 @@ Here's cifar100 result:
 "auc_score": 0.8040,
 ```
 
+We can clearly see that the cifar100 do have overfit problem. It might worth to do what we did in ex_2 to improve our result.
+
+Comparison so far:
+
+> cifar10:
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 72.24% | 124 seconds | 0.444 seconds |
+| EX-2 | 79.12% | 2287 seconds | 2.595 seconds |
+| EX-3 | 86.00% | 1835 seconds | 3.552 seconds |
+
+> cifar 100
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 34.65% | 127 seconds | 0.486 seconds |
+| EX-2 | 48.84% | 2281 seconds | 2.478 seconds |
+| EX-3 | 61.2% | 1838 seconds | 3.560 seconds |
+
+For this, we can see massive improvement using the transfer learning and better model. But how much can improve from now on?
+
+### EX-4
+
+Here, we did the same as ex_2 did. Adding learning rate scheduler. The 
+
 ## Mistake I've made
 
 - Validation and train Set contains duplicate image, which cause the validation accuracy goes insanely high. Showing the inaccurate metrics.
+- Appending the training set copy and thinks that it's part of the data augmentation: During the training, it's kind of a sampling process, so it won't work.
 - Not reading the documentation or overly rely on the prompt that AI gives me. Sometimes if you just scraping the curface, it's easy to make stupid mistakes that would cost you like 2 days.
 - Using WSL as my first development, which turns out running on linux natively would be signigicantly faster. It seems like even on WSL, it still use CUDA that embedds in windows. And it makes anything related to data transform significantly slower.
+- Falling into the rabbit hole of browsing instead of actually do stuff or spending time actually know what I'm doing.
 - Procrastination. I could've try more thing, or doing more ablation study.
 
 ## Things I can improve or try
