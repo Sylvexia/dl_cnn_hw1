@@ -1,4 +1,5 @@
 # 深度學習 作業一
+
 A1085125 洪祐鈞 (Sylvex Hung) 
 2023/02/24
 
@@ -46,7 +47,7 @@ Also it would also generate data for cache-ing the cifar10/cifar100 datasets.
 - The computational resources is limited, instead of choosing a bulky model which has highest accuracy. What I care about is the efficiency of the model, which means I can get high accuracy in short amount of time. This way, I can have more feedback to fix things earlier and making more prototypes.
 - Running on local computer, which I can modularize my code and having better developter experience. ~~Also, I love copilot.~~
 - Keeping the training/testing log, and visualize the result. For better knowing what exactly happened during training and testing.
-- Crammming as much of the batch size as my GPU can handle to increase the training speed.
+- Cramming as much of the batch size as my GPU can handle to increase the training speed.
 
 ## Experiments
 
@@ -408,9 +409,85 @@ Also larger model introduce more inference time I guess.
 
 > Issac Newton: If I have seen further than others, it is by standing upon the shoulders of giants.
 
-Instead of training everything from scratch, why not
+Instead of doing everything from scratch, why not just build from existing solution? 
 
-#### 
+#### Transfer learning
+
+My main goal of choosing of the model is to get the highest accuracy in short amount of time on limited computertational resource. Hence I choose efficientnetv2 as a starting point to do transfer learning.
+
+Model info: 
+
+```
+# efficientnet_v2_s
+
+Total params: 21,458,488
+Trainable params: 21,458,488
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.01
+Forward/backward pass size (MB): 7.38
+Params size (MB): 81.86
+Estimated Total Size (MB): 89.25
+```
+
+I'm not complete sure why we don't need to modify the input and output layer to get the result. It seems like the network utilize the compound scaling mechanism under the hood.
+
+Here, I feed the model ```32*32``` image directly to the model, without resizing, data augmentation and learning rate scheduling. 
+
+(Parameters: lr=0.0001, weight_decay=0.0001, epoch = 40)
+
+Here's cifar 10 result:
+
+![picture 23](images/b5dfce62b61eb0485f6b3acb9a231eaf13821e84fbabaf45158930864713aeae.png)  
+
+![picture 24](images/38e3fea1183db55737b29438a33e4e1b4a8261802f58809dd12a403853f5db77.png)  
+
+![picture 25](images/82fd0063aae2508fbaf010346184e2d5075fe030da9a377a07c7a9d868cd8582.png)  
+
+```
+# Training:
+
+"best_val_accuracy": 86.39%,
+"best_epoch": 39,
+"train_time": 1835 seconds
+```
+
+```
+# Testing: 
+"accuracy": 86.00%,
+"losses": 0.6456,
+"testing time": 3.552 seconds,
+"precision_score": 0.8633,
+"recall_score": 0.8600,
+"f1_score": 0.8608,
+"auc_score": 0.9222,
+```
+
+Here's cifar100 result:
+
+![picture 26](images/f8e2cd797f208cb318d90df9c5e51af8991f8c47cbac33a985bf43109a13d1b1.png)  
+
+![picture 27](images/6542c06d672a24d5c6bd998c9151b671f9b64dafd892629bd7ba319422048c47.png)
+
+```
+# Training
+
+"best_val_accuracy": 60.74%,
+"best_epoch": 40,
+"train_time": 1838 seconds
+```
+
+```
+# Testing
+
+"accuracy": 61.2%,
+"losses": 2.277,
+"testing time": 3.560,
+"precision_score": 0.6193,
+"recall_score": 0.612,
+"f1_score": 0.6130,
+"auc_score": 0.8040,
+```
 
 ## Mistake I've made
 
