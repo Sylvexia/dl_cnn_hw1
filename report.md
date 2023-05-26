@@ -19,7 +19,7 @@ A1085125 洪祐鈞 (Sylvex Hung)
 
 ## How to run?
 
-Referring requirements.txt to set up your environment, preferably use a conda first so it would not messed up your local environment.
+Referring requirements.txt to set up your environment, preferably use a conda environment first so it would not messed up your local environment.
 
 Running: ```python ex_1.py``` for first experiment, there are 5 experiments for respective experiments, it would start training and testing cifar10/cifar100 dataset for a model. Specifically, like the following:
 ```
@@ -35,7 +35,7 @@ After running any experiments, a folder named ```ex_{number}``` would be generat
 - accuracy.png: train/validation accuracy during training
 - confusion_matrix.png: as the name shows.
 - best.pth: the best model best validation accuracy during training.
-- epoch-{num}: model file for checkpoint.
+- epoch-```num```: model file for checkpoint.
 
 The log contains training/testing complete time, accuracy/loss per epoch during training, test metrics (accuracy, ioc score, precision, F1_score, and etc.) I would do a comparison at comparision, if you want to see more fine-grained version, you can check that out!
 
@@ -273,6 +273,8 @@ Here's cifar100 results:
 
 As the result shows, I get ```(+3%/+7%)``` (cifar10/cifar100) accuracy improvement compares to ex_1 by doing this. But the model still has overfitting problem, further trainging would not help at all.
 
+### Learning rate scheduling:
+
 Hence, new techniques introduces: learning rate scheduling:
 
 From this [【Day20】Pytorch Learning Rate Scheduler](https://ithelp.ithome.com.tw/m/articles/10298468), It states that it can reduce the training time and help the convergence of the training, so I think it's good to give it a shot.
@@ -330,6 +332,8 @@ Here's cifar100 results:
 
 From the loss and accuracy, it shows that the overfitting problem is reduced, and it seems we can train futher without much hesitation.
 
+~~Edit: Arguably the learning rate was too large or weight decay too small? should've done more ablation study but I'm lazy and running out of time~~
+
 Now changing the epoch from 50 to 100:
 
 Here's the cifar10 result:
@@ -346,7 +350,6 @@ Here's the cifar10 result:
 "best_epoch": 100,
 "train_time": 2287 seconds
 ```
-
 ```
 "accuracy": 79.12%,
 "losses": 0.6183,
@@ -381,7 +384,33 @@ Here's cifar100 result:
 "auc_score": 0.7416,
 ```
 
-To be honest, from the validation loss, I think we can add more batches, but I think to make train
+To be honest, from the validation loss, I think we can add more epochs. But It would still have the limit that doesn't make to my expectation. My expectation is cifar100 should have at least 80% accuracy.
+
+Here's the comparison so far:
+
+> cifar10:
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 72.24% | 124 seconds | 0.444 seconds |
+| EX-2 | 79.12% | 2287 seconds | 2.595 seconds |
+
+> cifar 100
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 34.65% | 127 seconds | 0.486 seconds |
+| EX-2 | 48.84% | 2281 seconds | 2.478 seconds |
+
+Also larger model introduce more inference time I guess.
+
+### EX-3
+
+> Issac Newton: If I have seen further than others, it is by standing upon the shoulders of giants.
+
+Instead of training everything from scratch, why not
+
+#### 
 
 ## Mistake I've made
 
