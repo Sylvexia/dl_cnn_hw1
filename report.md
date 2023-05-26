@@ -1,5 +1,6 @@
 # 深度學習 作業一
-A1085125 洪祐鈞(Sylvex Hung) 2023/02/24
+A1085125 洪祐鈞 (Sylvex Hung) 
+2023/02/24
 
 ## Disclaimer
 
@@ -36,17 +37,16 @@ After running any experiments, a folder named ```ex_{number}``` would be generat
 - best.pth: the best model best validation accuracy during training.
 - epoch-{num}: model file for checkpoint.
 
-The log contains training/testing complete time, accuracy/loss per epoch during training, test metrics(accuracy, ioc score, precision, F1_score, and etc.) I would do a comparison at comparision, if you want to see more fine-grained version, you can check that out!
-(tips: use json formater can help you see the log if your ide has one.)
+The log contains training/testing complete time, accuracy/loss per epoch during training, test metrics (accuracy, ioc score, precision, F1_score, and etc.) I would do a comparison at comparision, if you want to see more fine-grained version, you can check that out!
 
 Also it would also generate data for cache-ing the cifar10/cifar100 datasets.
 
 ## General Strategy of the homework
 
-- The computational resources is limited, instead of choosing a bulky model which has highest accuracy. What I care about is the efficiency of the model, which means I can get high accuracy in short amount of time. This way, I can have more feedback 
+- The computational resources is limited, instead of choosing a bulky model which has highest accuracy. What I care about is the efficiency of the model, which means I can get high accuracy in short amount of time. This way, I can have more feedback to fix things earlier and making more prototypes.
 - Running on local computer, which I can modularize my code and having better developter experience. ~~Also, I love copilot.~~
 - Keeping the training/testing log, and visualize the result. For better knowing what exactly happened during training and testing.
-- Crammming as much of the batch size as my GPU can handle.
+- Crammming as much of the batch size as my GPU can handle to increase the training speed.
 
 ## Experiments
 
@@ -86,6 +86,8 @@ Here's Cifar 10 results:
 
 ![picture 1](images/f7e0e16dc1ab278656134d68fd2effb041c36c9fce0edb3edde1b2db41172b37.png)
 
+![picture 2](images/7ef38fea291b1cc8ffd9f9db29f19d7ba64136c19b7ea1f8468396e13ecfe4c7.png)
+
 ![picture 3](images/9f53b04cf881a022f7cacc68c229290a2a6cabf480491171124c745e546b7d0e.png)
 
 ```
@@ -108,9 +110,9 @@ Here's Cifar 10 results:
 
 Here's Cifar 100 results:
 
-![picture 2](images/7ef38fea291b1cc8ffd9f9db29f19d7ba64136c19b7ea1f8468396e13ecfe4c7.png)
+![picture 12](images/6d25cb9755b554b04047de310c5189c08ac0ee4f0143ebd2036705b79b646ba8.png)  
 
-![picture 4](images/d6170958a214e01c99cd268ab2368f73a7410bf38dd5d8d45f70dcb0f24ea595.png)
+![picture 10](images/6d25cb9755b554b04047de310c5189c08ac0ee4f0143ebd2036705b79b646ba8.png)  
 
 ```
 # Training: 
@@ -149,6 +151,8 @@ For the spculation above, I think it's good to add some changes accordingly:
 3. Making the model larger to extract more features.
 
 Simply words: Bigger, better and stronger.
+
+#### Model design
 
 So I make the model as following:
 
@@ -194,10 +198,11 @@ Specifically:
 The reason my design was:
 
 - In the VGG model paper, it states that using smaller size convolution can increase the receptive field.
-- Also using size 3 convoltion layer is just easier to design the layer afterwards.
+- Using size (3,1,1) convolution layer and (2,2) max pooling layer is just easier to design and calculate the layer output.
 - Multiple linear layers seems perform better than single layer.
-- With the consideration of training time, and increase the size of the image, 
-I'm afraid of increasing the depth of the network.
+- With the consideration of training time, and increase the size of the image, I'm afraid of increasing the depth of the network.
+
+#### Data augmentation
 
 For the data augmentation part, basically I'm refer to the artical:
 [(Image Classification — Cifar100)](https://shihyung1221.medium.com/image-classification-cifar100-af751271b398): The author resize to image larger to get better result. Hence, I do the following for the augmentation:
@@ -208,11 +213,175 @@ transforms.RandomCrop(128, padding=16),
 transforms.RandomHorizontalFlip(),
 ```
 
-The way I didn't do too much augmentation has 2 reasons:
+The way I didn't do too much transformation has several reasons:
 - I was trying training on WSL and kaggle, transformation cause massive bottleneck during training. The GPU did random spike with low utilization on WSL. For kaggle, it overloads the GPU. (Although I did re-train on native linux and the performance is a lot better)
 - This project [kuangliu /
-pytorch-cifar](https://github.com/kuangliu/pytorch-cifar/blob/master/main.py) only use the transformation above with sigle decay of learning rate to achieve over 90% accuracy on cifar 10.
+pytorch-cifar](https://github.com/kuangliu/pytorch-cifar/blob/master/main.py) only use the transformation above to achieve over 90% accuracy on cifar 10.
 
+Hence with the resize preprocess, augmentation transformation, and larger CNN networks:
+
+Parameter: (lr=0.001, weight_decay=0.0001, epoch=50, also optimizer switch to AdamW)
+
+Here's cifar10 results:
+
+![picture 5](images/25650c140b3d77c5b3bca741a39838ba382835c58692e6ff6edaa3464c4fa6ca.png)  
+
+![picture 6](images/c41fabab24014566aef7fbdfeafbdbb2f5b09fbcd31dd481622acd567073cef7.png)  
+
+![picture 7](images/72431c98cd365ac0d940cdac7a68f5c601bddad46af3a19cf6d4bdf903903509.png)  
+
+```
+# Training:
+"best_val_accuracy": 75.51%,
+"best_epoch": 48,
+"train_time": 1119 seconds
+```
+
+``` Testing:
+"accuracy": 75.16%,
+"losses": 1.166,
+"testing time": 2.501,
+"precision_score": 0.7529,
+"recall_score": 0.7516,
+"f1_score": 0.7509,
+"auc_score": 0.8620,
+```
+
+Here's cifar100 results:
+
+![picture 8](images/193418f6fbe3e0f66d2c00b87de95e34c98a42d746b2232d52a7e2eda6b6fe41.png)  
+
+![picture 9](images/66aea996ac250db3d1270689a3a09415c60872178f91894e3101a8166f5e6172.png)
+
+```
+# Training:
+"best_val_accuracy": 39.96%,
+"best_epoch": 19,
+"train_time": 1137 seconds
+```
+
+```
+# Testing:
+"accuracy": 41.62%,
+"losses": 2.564,
+"testing time": 2.502 seconds,
+"precision_score": 0.4273,
+"recall_score": 0.4162,
+"f1_score": 0.4139,
+"auc_score": 0.7052,
+```
+
+As the result shows, I get ```(+3%/+7%)``` (cifar10/cifar100) accuracy improvement compares to ex_1 by doing this. But the model still has overfitting problem, further trainging would not help at all.
+
+Hence, new techniques introduces: learning rate scheduling:
+
+From this [【Day20】Pytorch Learning Rate Scheduler](https://ithelp.ithome.com.tw/m/articles/10298468), It states that it can reduce the training time and help the convergence of the training, so I think it's good to give it a shot.
+
+Here's cifar10 results:
+
+![picture 13](images/c766e04a3aafc10d735b635398c9df207a650bb23a861f26404cd7ed371cd084.png)  
+
+![picture 14](images/758ea4601c9e61d9bc1aff2f065ae0c77597114a1ea1c181876efebec865b2d5.png)
+
+![picture 17](images/8d817d68f6e94e2f3844ee8e348af5a440e8dd9342e3c54552a48229b1f273bd.png)  
+
+
+```
+# Training
+"best_val_accuracy": 76.05%,
+"best_epoch": 49,
+"train_time": 1133 seconds
+```
+
+```
+# Testing
+"accuracy": 0.7857,
+"losses": 0.6352,
+"testing time": 2.744 seconds,
+"precision_score": 0.7866,
+"recall_score": 0.7857,
+"f1_score": 0.7851,
+"auc_score": 0.8809,
+```
+
+Here's cifar100 results:
+
+![picture 15](images/fb77245e0e497d6c1be8ced5fdaa3936615355ec558a423027225e9a89672bb6.png)
+
+![picture 16](images/583aeacc4f130ec0a2766e9f3e7a7d61091feef089ae5f49324e4033c9aa7779.png)
+
+```
+# Training
+"best_val_accuracy": 42.86%,
+"best_epoch": 44,
+"train_time": 1148seconds
+```
+
+```
+# Testing
+"accuracy": 46.11%,
+"losses": 2.106,
+"testing time": 2.563,
+"precision_score": 0.4652,
+"recall_score": 0.4611,
+"f1_score": 0.4570,
+"auc_score": 0.7278,
+```
+
+From the loss and accuracy, it shows that the overfitting problem is reduced, and it seems we can train futher without much hesitation.
+
+Now changing the epoch from 50 to 100:
+
+Here's the cifar10 result:
+
+![picture 18](images/de4b431b5322b2d89c94ef9822ec1e5021069c67bd9c3cc9f37beae553a6b2db.png)  
+
+![picture 19](images/b5cb27a2b097419c9a23ebed08ea8ea926b7ee8791b5248382db90e78045aac0.png)  
+
+![picture 20](images/d4eb6b0e23df09ab01b22f4c1a3493448e825530179e4d606e0995ea59ef5912.png)
+
+```
+# Training:
+"best_val_accuracy": 77.21%,
+"best_epoch": 100,
+"train_time": 2287 seconds
+```
+
+```
+"accuracy": 79.12%,
+"losses": 0.6183,
+"testing time": 2.595,
+"precision_score": 0.7900,
+"recall_score": 0.7912,
+"f1_score": 0.7905,
+"auc_score": 0.884,
+```
+
+Here's cifar100 result:
+
+![picture 21](images/bbe9e6493f9460836dba1102d76225fa2415dffa3600d72c7994a577474dab19.png)  
+
+![picture 22](images/7f3e4fdc3ac43179ad9de9a700df209a67cc59ec05e35f9313d713ca0e688b9c.png)  
+
+```
+# Training:
+"best_val_accuracy": 46.4%,
+"best_epoch": 88,
+"train_time": 2281 seconds
+```
+
+```
+# Testing:
+"accuracy": 48.84%,
+"losses": 2.061,
+"testing time": 2.478,
+"precision_score": 0.4878,
+"recall_score": 0.4884,
+"f1_score": 0.4842,
+"auc_score": 0.7416,
+```
+
+To be honest, from the validation loss, I think we can add more batches, but I think to make train
 
 ## Mistake I've made
 
