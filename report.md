@@ -1,11 +1,11 @@
 # 深度學習 作業一
 
 A1085125 洪祐鈞 (Sylvex Hung) 
-2023/02/24
+2023/02/24 (probably)
 
 ## Disclaimer
 
-- The code in this homework is amalgamation of LLM prompt (ChatGPT and discord Clyde), GitHub Copilot autocompletion, and random code from the forum. I would provide the prompt of the LLM to llm_prompt.md, also keep the comment for the code generated from copilot.
+- The code in this homework is amalgamation of LLM prompt (ChatGPT and discord Clyde), GitHub Copilot autocompletion, and random code from the forum. I would provide the prompt of the LLM to llm_prompt.txt, also keep the comment for the code generated from copilot.
 - All the experiment are done on local computer, and the parameters for performance (e.x. dataloader num_workers) is massively depends on my own laptop. You may modify yourself to make it smoother on your computer. 
 
 ## Environments
@@ -22,7 +22,7 @@ A1085125 洪祐鈞 (Sylvex Hung)
 
 Referring requirements.txt to set up your environment, preferably use a conda environment first so it would not messed up your local environment.
 
-Running: ```python ex_1.py``` for first experiment, there are 5 experiments for respective experiments, it would start training and testing cifar10/cifar100 dataset for a model. Specifically, like the following:
+Running: ```python ex_1.py``` for first experiment, there are 5 experiments for respective experiments, it would start training and testing cifar10/cifar100 dataset for a model automatically. Specifically, like the following:
 
 ```
 if __name__ == '__main__':
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     train_cifar_100()
 ```
 
-After running any experiments, a folder named ```ex_{number}``` would be generated, which contains two folder ```cifar_10``` and ```cifar_100```, inside the folers, it would generate time-stampped folder for training/testing a single model, inside the timestampped folder, contains the important files as follows:
+After running any experiments, a folder named ```ex_{number}``` would be generated, which contains two folder ```cifar_10``` and ```cifar_100```. Inside the cifar folers, it would generate time-stampped folder for training/testing a single model. Inside the timestampped folder, contains the important files as follows:
 
 - train.json: training log
 - test.json: test log
@@ -40,7 +40,7 @@ After running any experiments, a folder named ```ex_{number}``` would be generat
 - loss.png: loss per epoch during training
 - accuracy.png: train/validation accuracy during training
 - confusion_matrix.png: as the name shows.
-- best.pth: the best model best validation accuracy during training.
+- best.pth: the best model best validation accuracy during training. That model would be fed to test the final metrics!
 - epoch-```num```: model file for checkpoint.
 
 The log contains training/testing complete time, accuracy/loss per epoch during training, test metrics (accuracy, ioc score, precision, F1_score, and etc.) I would do a comparison at comparision, if you want to see more fine-grained version, you can check that out!
@@ -56,9 +56,13 @@ Also it would also generate data for cache-ing the cifar10/cifar100 datasets.
 
 ## Experiments
 
+There's 5 experiment: ex-1, ex-2 ... ex-5. The experiments are as follows:
+
 ### EX-1
 
-Basically, the model is the same as what the professor gave us. What's different is the batch size is 128, and the number of epoch is 50.
+Basically, the model is the same as what the professor gave us. What's different is the batch size is 128, and the number of epoch is 50. 
+
+In the cifar10/100 train set, it randomly split into train/validation set 80%/20%. The test set of the cifar dataset is for measuring the final metrics. The model with the best validation accuracy would be directly fed to measure the final metrics.
 
 The model architecture is as follows: (num_classes = 100 for cifar100)
 
