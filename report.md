@@ -3,10 +3,11 @@
 A1085125 洪祐鈞 (Sylvex Hung) 
 2023/02/24 (probably)
 
-## Disclaimer
+## Notice
 
-- The code in this homework is amalgamation of LLM prompt (ChatGPT and discord Clyde), GitHub Copilot autocompletion, and random code from the forum. I would provide the prompt of the LLM to llm_prompt.txt, also keep the comment for the code generated from copilot.
-- All the experiment are done on local computer, and the parameters for performance (e.x. dataloader num_workers) is massively depends on my own laptop. You may modify yourself to make it smoother on your computer. 
+- The code in this homework is amalgamation of LLM prompt (ChatGPT and discord Clyde), GitHub Copilot autocompletion, and random code from the forum. I would provide the prompt of the LLM to ```llm_prompt.txt```, also keep the code comment that copilot generated based on.
+- All the experiment are done on local computer, and the parameters for performance (e.x. dataloader num_workers) is massively depends on my own laptop. You may modify yourself to make it smoother on your computer.
+- The model link is at ```model_link.txt```
 
 ## Environments
 
