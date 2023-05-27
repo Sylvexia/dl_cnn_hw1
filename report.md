@@ -6,7 +6,7 @@ A1085125 洪祐鈞 (Sylvex Hung)
 ## Disclaimer
 
 - The code in this homework is amalgamation of LLM prompt (ChatGPT and discord Clyde), GitHub Copilot autocompletion, and random code from the forum. I would provide the prompt of the LLM to llm_prompt.md, also keep the comment for the code generated from copilot.
-- I would also list some reference during my research, for the transparancy.
+- All the experiment are done on local computer, and the parameters for performance (e.x. dataloader num_workers) is massively depends on my own laptop. You may modify yourself to make it smoother on your computer. 
 
 ## Environments
 
@@ -23,15 +23,20 @@ A1085125 洪祐鈞 (Sylvex Hung)
 Referring requirements.txt to set up your environment, preferably use a conda environment first so it would not messed up your local environment.
 
 Running: ```python ex_1.py``` for first experiment, there are 5 experiments for respective experiments, it would start training and testing cifar10/cifar100 dataset for a model. Specifically, like the following:
+
 ```
 if __name__ == '__main__':
     train_cifar_10()
     train_cifar_100()
 ```
+
 After running any experiments, a folder named ```ex_{number}``` would be generated, which contains two folder ```cifar_10``` and ```cifar_100```, inside the folers, it would generate time-stampped folder for training/testing a single model, inside the timestampped folder, contains the important files as follows:
 
 - train.json: training log
 - test.json: test log
+
+     The json files are also used to generate visualization image!
+
 - loss.png: loss per epoch during training
 - accuracy.png: train/validation accuracy during training
 - confusion_matrix.png: as the name shows.
@@ -196,7 +201,7 @@ Specifically:
 - 2 linear layers: with 1024 and 10/100 output (cifar10/cifar100)
 - Activation function are all ReLU
 
-The reason my design was:
+The reason behind my design was:
 
 - In the VGG model paper, it states that using smaller size convolution can increase the receptive field.
 - Using size (3,1,1) convolution layer and (2,2) max pooling layer is just easier to design and calculate the layer output.
@@ -215,7 +220,7 @@ transforms.RandomHorizontalFlip(),
 ```
 
 The way I didn't do too much transformation has several reasons:
-- I was trying training on WSL and kaggle, transformation cause massive bottleneck during training. The GPU did random spike with low utilization on WSL. For kaggle, it overloads the GPU. (Although I did re-train on native linux and the performance is a lot better)
+- I was trying training on WSL and kaggle, transformation cause massive bottleneck during training. The GPU did random spike with low utilization on WSL. For kaggle, it overloads the CPU. (Although I did re-train on native linux and the performance is a lot better)
 - This project [kuangliu /
 pytorch-cifar](https://github.com/kuangliu/pytorch-cifar/blob/master/main.py) only use the transformation above to achieve over 90% accuracy on cifar 10.
 
@@ -317,7 +322,7 @@ Here's cifar100 results:
 # Training
 "best_val_accuracy": 42.86%,
 "best_epoch": 44,
-"train_time": 1148seconds
+"train_time": 1148 seconds
 ```
 
 ```
@@ -331,7 +336,7 @@ Here's cifar100 results:
 "auc_score": 0.7278,
 ```
 
-From the loss and accuracy, it shows that the overfitting problem is reduced, and it seems we can train futher without much hesitation.
+From the loss and accuracy, it shows that the overfitting problem is reduced, squeeze out ```(+3%/+5%)``` accuracy,  and it seems we can train futher without much hesitation.
 
 ~~Edit: Arguably the learning rate was too large or weight decay too small? should've done more ablation study but I'm lazy and running out of time~~
 
@@ -385,7 +390,7 @@ Here's cifar100 result:
 "auc_score": 0.7416,
 ```
 
-To be honest, from the validation loss, I think we can add more epochs. But It would still have the limit that doesn't make to my expectation. My expectation is cifar100 should have at least 80% accuracy.
+Increasing from 50 epochs to 100 epochs squeeze out ```(+0.5%/+2%)``` accuracy more. To be honest, from the validation loss, I think we can add more epochs. But It would still hit the limit that doesn't meet up my expectation. My expectation is cifar100 should have at least 80% accuracy.
 
 Here's the comparison so far:
 
@@ -434,9 +439,9 @@ I'm not complete sure why we don't need to modify the input and output layer to 
 
 Here, I feed the model ```32*32``` image directly to the model, without resizing, data augmentation and learning rate scheduling. 
 
-(Parameters: lr=0.0001, weight_decay=0.0001, epoch = 40)
+(Parameters: Adam optimizer, lr=0.0001, weight_decay=0.0001, epoch = 40)
 
-During the transfer learning, it seems the learning rate shouldn't be too high.
+During the transfer learning, it seems the learning rate shouldn't be too high, so I set the learning rate to 1/10 as the original.
 
 Here's cifar 10 result:
 
@@ -509,13 +514,179 @@ Comparison so far:
 | - | - | - | - |
 | EX-1 | 34.65% | 127 seconds | 0.486 seconds |
 | EX-2 | 48.84% | 2281 seconds | 2.478 seconds |
-| EX-3 | 61.2% | 1838 seconds | 3.560 seconds |
+| EX-3 | 61.20% | 1838 seconds | 3.560 seconds |
 
 For this, we can see massive improvement using the transfer learning and better model. But how much can improve from now on?
 
 ### EX-4
 
-Here, we did the same as ex_2 did. Adding learning rate scheduler. The 
+#### Playing the same old trick
+
+Here, we did the same as ex_2 did. Adding learning rate scheduler, image resizing and data augmentation.
+
+(Parameters: Adam optimizer, lr=0.0001, weight_decay=0.0001, epoch = 15)
+
+Here's cifar10 result: 
+
+![picture 28](images/f3ab1246cda291b16a179834af2727e43361a06d929e1f5c44fbb0059979eaa2.png)
+
+![picture 31](images/6530a6a323b9a2dbe653fc056a854d457dfb56ef58024792445f5adb0b374cf5.png)  
+
+![picture 32](images/f5471b3d72fcacf56497937a09a8ed1555156265b2f26bc91cc1f893a1927a71.png)  
+
+```
+# Training:
+
+"best_val_accuracy": 96.5%,
+"best_epoch": 12,
+"train_time": 2906 seconds
+```
+
+```
+# Testing:
+
+"accuracy": 96.24%,
+"losses": 0.1624,
+"testing time": 13.37 seconds,
+"precision_score": 0.9624,
+"recall_score": 0.9624,
+"f1_score": 0.9624,
+"auc_score": 0.9791,
+
+```
+
+Here's cifar100 result: 
+
+![picture 33](images/52a6946e4476bcdfe460b747ffa362c00aab1418bd31a954623140b98dd87fde.png)  
+
+![picture 34](images/11313de01ab0b8d7001e82a869a62475718c68afe34e001572e0c1de1b0379fb.png)
+
+```
+# Training:
+"best_val_accuracy": 84.54%,
+"best_epoch": 10,
+"train_time": 2912 seconds
+```
+
+```
+# Testing:
+"accuracy": 83.8%,
+"losses": 0.806,
+"testing time": 13.43 seconds,
+"precision_score": 0.8404,
+"recall_score": 0.838,
+"f1_score": 0.8375,
+"auc_score": 0.9182,
+
+```
+
+Here's the comparison so far:
+
+> cifar10:
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 72.24% | 124 seconds | 0.444 seconds |
+| EX-2 | 79.12% | 2287 seconds | 2.595 seconds |
+| EX-3 | 86.00% | 1835 seconds | 3.552 seconds |
+| EX-4 | 96.50% | 2906 seconds | 13.37 seconds |
+
+> cifar 100
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 34.65% | 127 seconds | 0.486 seconds |
+| EX-2 | 48.84% | 2281 seconds | 2.478 seconds |
+| EX-3 | 61.20% | 1838 seconds | 3.560 seconds |
+| EX-4 | 83.80% | 2912 seconds | 13.43 seconds |
+
+From the comparison, we can see that apply data augmentation, image resizing and learning rate scheduling. We cam massively improve the accuracy, while it make the cifar100 to hit over 0.9 auc score, too. Also, larger image for the same model would increase the inference time in testing.
+
+### EX-5
+
+Basically on paper with code website, I saw the highest ImageNet accuracy using Lion optimizer. Hoping to squeeze out more accuracy extending from ex-4, but I cannot surpass the current accuracy even train twice epoches as ex-4 does. Maybe blindly using the state-of-the-art technology may no always work.
+
+ref: [Symbolic Discovery of Optimization Algorithms ](https://paperswithcode.com/paper/symbolic-discovery-of-optimization-algorithms)
+
+Here's cifar10 result:
+
+![picture 35](images/1b9042ecb9923755f096e775de53d08dfb0c0255a712dde88cf0147244b08a7a.png)  
+
+![picture 36](images/1dcf82847a0a8d3204ab0574ed882fdbb734eb4b4be72d72515cf104dbc37ce3.png)  
+
+![picture 37](images/3d778145470c193348233e06b30e00701cb2190f2536fdb1cee47f78644189a5.png)
+
+```
+# Training:
+"best_val_accuracy": 96.68%,
+"best_epoch": 20,
+"train_time": 5846 seconds
+```
+
+```
+# Testing:
+"accuracy": 96.14%,
+"losses": 0.1695,
+"testing time": 13.27 seconds,
+"precision_score": 0.9615,
+"recall_score": 0.9614,
+"f1_score": 0.9614,
+"auc_score": 0.9786,
+```
+
+Here's cifar100 result:
+
+![picture 38](images/f88323a1fe17c5fde7e950d73c7e516422ef99a9ab3824b9fe5bdceddde7f1a7.png)  
+
+![picture 39](images/4a5c23a36216e3b1fd232a5d2b797ff3d0c92006d145bcd3d5ee8758d63b60d6.png)  
+
+```
+# Training:
+"best_val_accuracy": 83.33,
+"best_epoch": 23,
+"train_time": 5836 seconds
+```
+
+```
+# Testing
+"accuracy": 0.8307,
+"losses": 0.9209934959411621,
+"testing time": 13.394379615783691,
+"precision_score": 0.8358766340629521,
+"recall_score": 0.8306999999999998,
+"f1_score": 0.8310803421424419,
+"auc_score": 0.9144949494949496,
+```
+
+Here's the comparison so far:
+
+> cifar10:
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 72.24% | 124 seconds | 0.444 seconds |
+| EX-2 | 79.12% | 2287 seconds | 2.595 seconds |
+| EX-3 | 86.00% | 1835 seconds | 3.552 seconds |
+| EX-4 | 96.24% | 2906 seconds | 13.37 seconds |
+| EX-5 | 96.14% | 5846 seconds | 13.27 seconds |
+
+> cifar 100
+
+| Experiment | Accuracy | Training time | Testing tine |
+| - | - | - | - |
+| EX-1 | 34.65% | 127 seconds | 0.486 seconds |
+| EX-2 | 48.84% | 2281 seconds | 2.478 seconds |
+| EX-3 | 61.20% | 1838 seconds | 3.560 seconds |
+| EX-4 | 83.80% | 2912 seconds | 13.43 seconds |
+| EX-5 | 83.33% | 5836 seconds | 13.39 seconds |
+
+## Conclusion:
+
+Here's few things to conclude all the experiment:
+1. Larger model can improve the accuracy, but these's still some limit.
+2. Data augmentation, resizing the image bigger can improve the accuracy. Especially if the sample size is small.
+3. Scheduling the learning rate can help to train the model a lot, usually it can lead to better result. Practically speaking, it feels more tolerant to train a model, since aside from the model and data preprocessing, learning rate feels the biggest factor of the accuracy result.
+4. Using the state-of-the-art-technology may not always works better.
 
 ## Mistake I've made
 
@@ -523,16 +694,21 @@ Here, we did the same as ex_2 did. Adding learning rate scheduler. The
 - Appending the training set copy and thinks that it's part of the data augmentation: During the training, it's kind of a sampling process, so it won't work.
 - Not reading the documentation or overly rely on the prompt that AI gives me. Sometimes if you just scraping the curface, it's easy to make stupid mistakes that would cost you like 2 days.
 - Using WSL as my first development, which turns out running on linux natively would be signigicantly faster. It seems like even on WSL, it still use CUDA that embedds in windows. And it makes anything related to data transform significantly slower.
-- Falling into the rabbit hole of browsing instead of actually do stuff or spending time actually know what I'm doing.
-- Procrastination. I could've try more thing, or doing more ablation study.
+- Falling into the rabbit hole of browsing instead of actually do stuff.
+- Procrastination. I could've try more thing, or doing more ablation study. While it's actually give me more time to think and have more ideas on this project.
 
 ## Things I can improve or try
 
+- Trying test-time-validation (TTL), it's seems like this technique can also squeeze out some accuracy. However, it's harder to implement or harder to understand for me.
+- Read and save the model config to have more fined-grained experiment management, there's too much thing done on-the-fly and not present in this report.
+- Learning how efficientnetv2 work, it's still a interesting topic for me.
+- Trying training efficientnetv2 without pretrained model, while I'm about to end the homework and now I think I should've done this.
+- Trying variety of learning rate scheulers.
 - Using Kaggle and utilizing the distributed training for getting faster result. (But modularizing the code seems a bit of a pain)
-- ~~Using the lab GPU without any permission, for my own greed.~~
+- ~~Steal the lab GPU without any permission, for my own greed.~~
 - Doing more ablation study. I tend to doing things on the fly and forget what exactly I was aiming for.
-- Using tensorboard for realtime visualization. (It feels bad after I'd done the visualizing part and then seeing this.)
+- Using tensorboard for realtime visualization. (It feels bad after I'd done the visualizing part and then seeing this.). Or trying out more framework. It seems like fast.ai has dominate the kaggle competition for quite some time.
 
 ## Final Thoughts
 
-For me, implementation plays huge parts for my learning habits. If I cannot implement what I've learned, then I mostly may have not have that level of understanding of the domain knowledge.
+For me, implementation plays huge parts for my learning habits. If I cannot implement what I've learned, then I mostly may have not have that level of understanding of the domain knowledge. While implementing these kind of project, I constantly searching on the Internet and use various tools to learn a lot of stuff on the fly. Also sorry for the late submission of the homework, recently there's too much things going on my life while I was trying to complete my report. I'm still trying to find a balance in my life.  

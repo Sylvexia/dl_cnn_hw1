@@ -7,4 +7,4 @@ import torch
 
 model = efficientnet_v2_s(pretrained=True)
 model = model.cuda()
-summary(model, (3, 32, 32))
+summary(model, (3, 128, 128))
